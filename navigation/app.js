@@ -9,9 +9,6 @@ import Welcome from '../screens/Welcome';
 import Login from '../screens/Login';
 import VPN from '../screens/VPN';
 import Dashboard from '../screens/Dashboard';
-import Servers from '../screens/Servers';
-import Statistics from '../screens/Statistics';
-import Settings from '../screens/Settings';
 import Profile from '../screens/Profile';
 
 const Stack = createNativeStackNavigator();
@@ -39,18 +36,12 @@ function MainTabs({ navigation }) {
           let iconName;
           if (route.name === 'Dashboard') iconName = focused ? 'home' : 'home-outline';
           else if (route.name === 'VPN') iconName = focused ? 'shield' : 'shield-outline';
-          else if (route.name === 'Servers') iconName = focused ? 'globe' : 'globe-outline';
-          else if (route.name === 'Statistics') iconName = focused ? 'bar-chart' : 'bar-chart-outline';
-          else if (route.name === 'Settings') iconName = focused ? 'settings' : 'settings-outline';
           return <Ionicons name={iconName} size={22} color={color} />;
         },
       })}
     >
       <Tab.Screen name="Dashboard" component={Dashboard} />
       <Tab.Screen name="VPN" component={VPN} />
-      <Tab.Screen name="Servers" component={Servers} />
-      <Tab.Screen name="Statistics" component={Statistics} />
-      <Tab.Screen name="Settings" component={Settings} />
     </Tab.Navigator>
   );
 }
