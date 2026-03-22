@@ -1,16 +1,4 @@
-import React, { Component } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Switch,
-  Alert,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,

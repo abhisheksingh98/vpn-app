@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -6,19 +6,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  ScrollView,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
-
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
   ScrollView,
   Alert,
   KeyboardAvoidingView,

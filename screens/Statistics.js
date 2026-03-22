@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -34,17 +34,6 @@ const DAILY = [
 ];
 const MAX_DL = Math.max(...DAILY.map(d => d.dl));
 const BAR_MAX_H = 80;
-
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Dimensions,
-  TouchableOpacity,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Statistics = () => {
   const [tab, setTab] = useState('week'); // week | month | all
