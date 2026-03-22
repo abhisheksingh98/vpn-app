@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Animated,
   Image,
@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 // constants
-import { images, theme, rgba } from "../constants";
+import { images, theme } from "../constants";
 const { background } = images;
 const { SIZES, COLORS } = theme;
 
@@ -36,24 +36,20 @@ const backgrounds = [
   },
 ];
 
-export default class Welcome extends Component {
-  scrollX = new Animated.Value(0);
+const Welcome = ({ navigation }) => {
+  const scrollX = useRef(new Animated.Value(0)).current;
+  const [slideIndex, setSlideIndex] = useState(0);
 
-  state = {
-    slideIndex: 0,
-  };
-
-  componentDidMount() {
-    this.scrollX.addListener(({ value }) => {
-      this.setState({ slideIndex: Math.floor(value / SIZES.width) });
+  useEffect(() => {
+    const listenerId = scrollX.addListener(({ value }) => {
+      setSlideIndex(Math.floor(value / SIZES.width));
     });
-  }
+    return () => {
+      scrollX.removeListener(listenerId);
+    };
+  }, [scrollX]);
 
-  componentWillUnmount() {
-    this.scrollX.removeAllListeners();
-  }
-
-  renderImages() {
+  const renderImages = () => {
     return (
       <ScrollView
         horizontal
@@ -64,7 +60,7 @@ export default class Welcome extends Component {
         snapToAlignment="center"
         showsHorizontalScrollIndicator={false}
         onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { x: this.scrollX } } }],
+          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
           { useNativeDriver: false }
         )}
       >
@@ -82,10 +78,10 @@ export default class Welcome extends Component {
         ))}
       </ScrollView>
     );
-  }
+  };
 
-  renderDots() {
-    const dotPosition = Animated.divide(this.scrollX, SIZES.width);
+  const renderDots = () => {
+    const dotPosition = Animated.divide(scrollX, SIZES.width);
 
     return (
       <View style={styles.dotsRow}>
@@ -105,10 +101,9 @@ export default class Welcome extends Component {
         })}
       </View>
     );
-  }
+  };
 
-  renderTexts() {
-    const { slideIndex } = this.state;
+  const renderTexts = () => {
     const slide = backgrounds[slideIndex];
 
     return (
@@ -117,32 +112,30 @@ export default class Welcome extends Component {
         <Text style={styles.description}>{slide && slide.description}</Text>
       </>
     );
-  }
+  };
 
-  render() {
-    const { navigation } = this.props;
+  return (
+    <SafeAreaView style={styles.container}>
+      {/* Slides */}
+      <View style={styles.imagesContainer}>{renderImages()}</View>
 
-    return (
-      <SafeAreaView style={styles.container}>
-        {/* Slides */}
-        <View style={styles.imagesContainer}>{this.renderImages()}</View>
+      {/* Bottom content */}
+      <View style={styles.bottomContainer}>
+        {renderTexts()}
+        {renderDots()}
+        <TouchableOpacity
+          style={styles.button}
+          activeOpacity={0.85}
+          onPress={() => navigation.navigate("Login")}
+        >
+          <Text style={styles.buttonText}>GET STARTED</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
+};
 
-        {/* Bottom content */}
-        <View style={styles.bottomContainer}>
-          {this.renderTexts()}
-          {this.renderDots()}
-          <TouchableOpacity
-            style={styles.button}
-            activeOpacity={0.85}
-            onPress={() => navigation.navigate("Login")}
-          >
-            <Text style={styles.buttonText}>GET STARTED</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
-}
+export default Welcome;
 
 const styles = StyleSheet.create({
   container: {

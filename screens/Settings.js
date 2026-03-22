@@ -10,50 +10,65 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default class Settings extends Component {
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Switch,
+  Alert,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-  state = {
+const Settings = ({ navigation }) => {
+  const [settings, setSettings] = useState({
     killSwitch: true,
     autoConnect: false,
     splitTunneling: false,
     notifications: true,
     darkMode: false,
-    dns: 'automatic',   // automatic | cloudflare | google | custom
-    protocol: 'udp',    // udp | tcp | wireguard
+    dns: 'automatic', // automatic | cloudflare | google | custom
+    protocol: 'udp', // udp | tcp | wireguard
     encryption: 'aes256', // aes256 | aes128 | chacha20
     startOnBoot: true,
     ipv6leak: true,
     dnsLeak: true,
+  });
+
+  const updateSetting = (key, value) => {
+    setSettings(prev => ({ ...prev, [key]: value }));
   };
 
-  showDNSAlert() {
+  const showDNSAlert = () => {
     Alert.alert('DNS Server', 'Choose your preferred DNS', [
-      { text: 'Automatic', onPress: () => this.setState({ dns: 'automatic' }) },
-      { text: 'Cloudflare (1.1.1.1)', onPress: () => this.setState({ dns: 'cloudflare' }) },
-      { text: 'Google (8.8.8.8)', onPress: () => this.setState({ dns: 'google' }) },
+      { text: 'Automatic', onPress: () => updateSetting('dns', 'automatic') },
+      { text: 'Cloudflare (1.1.1.1)', onPress: () => updateSetting('dns', 'cloudflare') },
+      { text: 'Google (8.8.8.8)', onPress: () => updateSetting('dns', 'google') },
       { text: 'Cancel', style: 'cancel' },
     ]);
-  }
+  };
 
-  showProtocolAlert() {
+  const showProtocolAlert = () => {
     Alert.alert('VPN Protocol', 'Choose VPN protocol', [
-      { text: 'UDP (Recommended)', onPress: () => this.setState({ protocol: 'udp' }) },
-      { text: 'TCP (Stable)', onPress: () => this.setState({ protocol: 'tcp' }) },
-      { text: 'WireGuard (Fast)', onPress: () => this.setState({ protocol: 'wireguard' }) },
+      { text: 'UDP (Recommended)', onPress: () => updateSetting('protocol', 'udp') },
+      { text: 'TCP (Stable)', onPress: () => updateSetting('protocol', 'tcp') },
+      { text: 'WireGuard (Fast)', onPress: () => updateSetting('protocol', 'wireguard') },
       { text: 'Cancel', style: 'cancel' },
     ]);
-  }
+  };
 
-  showEncryptionAlert() {
+  const showEncryptionAlert = () => {
     Alert.alert('Encryption', 'Choose encryption strength', [
-      { text: 'AES-256 (Strongest)', onPress: () => this.setState({ encryption: 'aes256' }) },
-      { text: 'AES-128 (Faster)', onPress: () => this.setState({ encryption: 'aes128' }) },
-      { text: 'ChaCha20 (Mobile)', onPress: () => this.setState({ encryption: 'chacha20' }) },
+      { text: 'AES-256 (Strongest)', onPress: () => updateSetting('encryption', 'aes256') },
+      { text: 'AES-128 (Faster)', onPress: () => updateSetting('encryption', 'aes128') },
+      { text: 'ChaCha20 (Mobile)', onPress: () => updateSetting('encryption', 'chacha20') },
       { text: 'Cancel', style: 'cancel' },
     ]);
-  }
+  };
 
-  renderToggle(label, subtitle, key) {
+  const renderToggle = (label, subtitle, key) => {
     return (
       <View style={styles.row}>
         <View style={{ flex: 1 }}>
@@ -61,16 +76,16 @@ export default class Settings extends Component {
           {subtitle ? <Text style={{ fontSize: 12, color: '#888', marginTop: 2 }}>{subtitle}</Text> : null}
         </View>
         <Switch
-          value={this.state[key]}
-          onValueChange={(v) => this.setState({ [key]: v })}
+          value={settings[key]}
+          onValueChange={(v) => updateSetting(key, v)}
           trackColor={{ true: '#0094FC', false: '#ccc' }}
           thumbColor={'#fff'}
         />
       </View>
     );
-  }
+  };
 
-  renderSelector(label, subtitle, value, onPress) {
+  const renderSelector = (label, subtitle, value, onPress) => {
     return (
       <TouchableOpacity style={styles.row} onPress={onPress}>
         <View style={{ flex: 1 }}>
@@ -83,83 +98,83 @@ export default class Settings extends Component {
         </View>
       </TouchableOpacity>
     );
-  }
+  };
 
-  renderSectionHeader(title) {
+  const renderSectionHeader = (title) => {
     return (
       <Text style={{ fontSize: 12, fontWeight: '700', color: '#888', letterSpacing: 0.8, paddingHorizontal: 20, paddingBottom: 8, paddingTop: 20 }}>
         {title.toUpperCase()}
       </Text>
     );
-  }
+  };
 
-  render() {
-    const { dns, protocol, encryption } = this.state;
-    const dnsLabel = { automatic: 'Automatic', cloudflare: 'Cloudflare', google: 'Google', custom: 'Custom' }[dns];
-    const protoLabel = { udp: 'UDP', tcp: 'TCP', wireguard: 'WireGuard' }[protocol];
-    const encLabel = { aes256: 'AES-256', aes128: 'AES-128', chacha20: 'ChaCha20' }[encryption];
+  const { dns, protocol, encryption } = settings;
+  const dnsLabel = { automatic: 'Automatic', cloudflare: 'Cloudflare', google: 'Google', custom: 'Custom' }[dns];
+  const protoLabel = { udp: 'UDP', tcp: 'TCP', wireguard: 'WireGuard' }[protocol];
+  const encLabel = { aes256: 'AES-256', aes128: 'AES-128', chacha20: 'ChaCha20' }[encryption];
 
-    return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: '#f5f7fa' }}>
-        <ScrollView showsVerticalScrollIndicator={false}>
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f5f7fa' }}>
+      <ScrollView showsVerticalScrollIndicator={false}>
 
-          <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 8 }}>
-            <Text style={{ fontSize: 22, fontWeight: '700', color: '#000' }}>Settings</Text>
-          </View>
+        <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 8 }}>
+          <Text style={{ fontSize: 22, fontWeight: '700', color: '#000' }}>Settings</Text>
+        </View>
 
-          {this.renderSectionHeader('Connection')}
-          <View style={styles.card}>
-            {this.renderToggle('Kill Switch', 'Block internet if VPN drops', 'killSwitch')}
-            <View style={styles.divider} />
-            {this.renderToggle('Auto Connect', 'Connect on app launch', 'autoConnect')}
-            <View style={styles.divider} />
-            {this.renderToggle('Start on Boot', 'Launch VPN when device starts', 'startOnBoot')}
-            <View style={styles.divider} />
-            {this.renderToggle('Split Tunneling', 'Choose which apps use VPN', 'splitTunneling')}
-          </View>
+        {renderSectionHeader('Connection')}
+        <View style={styles.card}>
+          {renderToggle('Kill Switch', 'Block internet if VPN drops', 'killSwitch')}
+          <View style={styles.divider} />
+          {renderToggle('Auto Connect', 'Connect on app launch', 'autoConnect')}
+          <View style={styles.divider} />
+          {renderToggle('Start on Boot', 'Launch VPN when device starts', 'startOnBoot')}
+          <View style={styles.divider} />
+          {renderToggle('Split Tunneling', 'Choose which apps use VPN', 'splitTunneling')}
+        </View>
 
-          {this.renderSectionHeader('Protocol & Encryption')}
-          <View style={styles.card}>
-            {this.renderSelector('DNS Server', 'Choose DNS resolver', dnsLabel, () => this.showDNSAlert())}
-            <View style={styles.divider} />
-            {this.renderSelector('VPN Protocol', null, protoLabel, () => this.showProtocolAlert())}
-            <View style={styles.divider} />
-            {this.renderSelector('Encryption', 'Data protection strength', encLabel, () => this.showEncryptionAlert())}
-          </View>
+        {renderSectionHeader('Protocol & Encryption')}
+        <View style={styles.card}>
+          {renderSelector('DNS Server', 'Choose DNS resolver', dnsLabel, showDNSAlert)}
+          <View style={styles.divider} />
+          {renderSelector('VPN Protocol', null, protoLabel, showProtocolAlert)}
+          <View style={styles.divider} />
+          {renderSelector('Encryption', 'Data protection strength', encLabel, showEncryptionAlert)}
+        </View>
 
-          {this.renderSectionHeader('Privacy & Security')}
-          <View style={styles.card}>
-            {this.renderToggle('DNS Leak Protection', 'Prevent DNS leaks', 'dnsLeak')}
-            <View style={styles.divider} />
-            {this.renderToggle('IPv6 Leak Protection', 'Block IPv6 traffic', 'ipv6leak')}
-          </View>
+        {renderSectionHeader('Privacy & Security')}
+        <View style={styles.card}>
+          {renderToggle('DNS Leak Protection', 'Prevent DNS leaks', 'dnsLeak')}
+          <View style={styles.divider} />
+          {renderToggle('IPv6 Leak Protection', 'Block IPv6 traffic', 'ipv6leak')}
+        </View>
 
-          {this.renderSectionHeader('General')}
-          <View style={styles.card}>
-            {this.renderToggle('Notifications', 'Connection alerts', 'notifications')}
-            <View style={styles.divider} />
-            {this.renderToggle('Dark Mode', 'Switch to dark theme', 'darkMode')}
-          </View>
+        {renderSectionHeader('General')}
+        <View style={styles.card}>
+          {renderToggle('Notifications', 'Connection alerts', 'notifications')}
+          <View style={styles.divider} />
+          {renderToggle('Dark Mode', 'Switch to dark theme', 'darkMode')}
+        </View>
 
-          {/* danger zone */}
-          {this.renderSectionHeader('Account')}
-          <View style={[styles.card, { marginBottom: 30 }]}>
-            <TouchableOpacity style={styles.row} onPress={() => Alert.alert('Clear Data', 'Clear all cached VPN data?', [{ text: 'Clear', style: 'destructive', onPress: () => {} }, { text: 'Cancel', style: 'cancel' }])}>
-              <Text style={{ fontSize: 15, color: '#F44336' }}>Clear Cache & Data</Text>
-              <Text style={{ color: '#aaa' }}>›</Text>
-            </TouchableOpacity>
-            <View style={styles.divider} />
-            <TouchableOpacity style={styles.row} onPress={() => this.props.navigation.replace('Login')}>
-              <Text style={{ fontSize: 15, color: '#F44336' }}>Sign Out</Text>
-              <Text style={{ color: '#aaa' }}>›</Text>
-            </TouchableOpacity>
-          </View>
+        {/* danger zone */}
+        {renderSectionHeader('Account')}
+        <View style={[styles.card, { marginBottom: 30 }]}>
+          <TouchableOpacity style={styles.row} onPress={() => Alert.alert('Clear Data', 'Clear all cached VPN data?', [{ text: 'Clear', style: 'destructive', onPress: () => { } }, { text: 'Cancel', style: 'cancel' }])}>
+            <Text style={{ fontSize: 15, color: '#F44336' }}>Clear Cache & Data</Text>
+            <Text style={{ color: '#aaa' }}>›</Text>
+          </TouchableOpacity>
+          <View style={styles.divider} />
+          <TouchableOpacity style={styles.row} onPress={() => navigation.replace('Login')}>
+            <Text style={{ fontSize: 15, color: '#F44336' }}>Sign Out</Text>
+            <Text style={{ color: '#aaa' }}>›</Text>
+          </TouchableOpacity>
+        </View>
 
-        </ScrollView>
-      </SafeAreaView>
-    );
-  }
-}
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
+
+export default Settings;
 
 const styles = StyleSheet.create({
   card: {

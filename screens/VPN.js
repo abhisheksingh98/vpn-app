@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import {
   Image,
   Modal,
@@ -15,28 +15,26 @@ import { images, theme, rgba, servers } from "../constants";
 const { icons } = images;
 const { SIZES, COLORS } = theme;
 
-export default class VPN extends Component {
-  state = {
-    connected: false,
-    server: null,
-    show: false,
-    automatic: {
-      name: "Automatic",
-      icon: icons.automatic,
-    },
+const VPN = () => {
+  const [connected, setConnected] = useState(false);
+  const [server, setServer] = useState(null);
+  const [show, setShow] = useState(false);
+  const [automatic] = useState({
+    name: "Automatic",
+    icon: icons.automatic,
+  });
+
+  const handleConnect = () => {
+    setConnected(!connected);
   };
 
-  handleConnect() {
-    const { connected } = this.state;
-    this.setState({ connected: !connected });
-  }
+  const handleServer = (server) => {
+    setServer(server);
+    setConnected(false);
+    setShow(false);
+  };
 
-  handleServer(server) {
-    this.setState({ server, connected: false, show: false });
-  }
-
-  renderServer() {
-    const { server, automatic } = this.state;
+  const renderServer = () => {
     const connection = server || automatic;
 
     return (
@@ -46,10 +44,9 @@ export default class VPN extends Component {
         <Image source={icons.dropdown} style={styles.dropdownIcon} />
       </View>
     );
-  }
+  };
 
-  renderServersModal() {
-    const { show, server, automatic } = this.state;
+  const renderServersModal = () => {
     const connection = server || automatic;
 
     return (
@@ -57,7 +54,7 @@ export default class VPN extends Component {
         <TouchableOpacity
           style={styles.modalOverlay}
           activeOpacity={1}
-          onPress={() => this.setState({ show: false })}
+          onPress={() => setShow(false)}
         >
           <View style={styles.modalSheet}>
             <Text style={styles.modalTitle}>Pick your Server</Text>
@@ -68,7 +65,7 @@ export default class VPN extends Component {
                 return (
                   <TouchableOpacity
                     key={`server-${item.name}`}
-                    onPress={() => this.handleServer(item)}
+                    onPress={() => handleServer(item)}
                     activeOpacity={0.7}
                   >
                     <View style={styles.serverItem}>
@@ -86,79 +83,77 @@ export default class VPN extends Component {
         </TouchableOpacity>
       </Modal>
     );
-  }
+  };
 
-  render() {
-    const { connected } = this.state;
+  return (
+    <SafeAreaView style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>VPN</Text>
+      </View>
 
-    return (
-      <SafeAreaView style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>VPN</Text>
-        </View>
-
-        {/* Status + Toggle */}
-        <View style={styles.centerContent}>
-          {/* Connection status badge */}
-          <View style={styles.statusBadge}>
-            <Text style={styles.statusText}>
-              {connected ? "Connected" : "Disconnected"}
-            </Text>
-            <View
-              style={[
-                styles.statusDot,
-                {
-                  backgroundColor: connected
-                    ? COLORS.success
-                    : rgba(COLORS.gray, 0.5),
-                },
-              ]}
-            />
-          </View>
-
-          {/* VPN icon */}
-          <Image
-            style={styles.vpnImage}
-            source={icons[connected ? "online" : "offline"]}
-          />
-
-          {/* Connect button */}
-          <TouchableOpacity
+      {/* Status + Toggle */}
+      <View style={styles.centerContent}>
+        {/* Connection status badge */}
+        <View style={styles.statusBadge}>
+          <Text style={styles.statusText}>
+            {connected ? "Connected" : "Disconnected"}
+          </Text>
+          <View
             style={[
-              styles.connectButton,
-              connected
-                ? styles.connectButtonOutlined
-                : styles.connectButtonFilled,
+              styles.statusDot,
+              {
+                backgroundColor: connected
+                  ? COLORS.success
+                  : rgba(COLORS.gray, 0.5),
+              },
             ]}
-            activeOpacity={0.85}
-            onPress={() => this.handleConnect()}
-          >
-            <Text
-              style={[
-                styles.connectButtonText,
-                connected && styles.connectButtonTextDark,
-              ]}
-            >
-              {connected ? "DISCONNECT" : "CONNECT NOW"}
-            </Text>
-          </TouchableOpacity>
+          />
         </View>
 
-        {/* Server picker */}
-        <TouchableOpacity
-          style={styles.serversBar}
-          onPress={() => this.setState({ show: true })}
-          activeOpacity={0.8}
-        >
-          {this.renderServer()}
-        </TouchableOpacity>
+        {/* VPN icon */}
+        <Image
+          style={styles.vpnImage}
+          source={icons[connected ? "online" : "offline"]}
+        />
 
-        {this.renderServersModal()}
-      </SafeAreaView>
-    );
-  }
-}
+        {/* Connect button */}
+        <TouchableOpacity
+          style={[
+            styles.connectButton,
+            connected
+              ? styles.connectButtonOutlined
+              : styles.connectButtonFilled,
+          ]}
+          activeOpacity={0.85}
+          onPress={() => handleConnect()}
+        >
+          <Text
+            style={[
+              styles.connectButtonText,
+              connected && styles.connectButtonTextDark,
+            ]}
+          >
+            {connected ? "DISCONNECT" : "CONNECT NOW"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Server picker */}
+      <TouchableOpacity
+        style={styles.serversBar}
+        onPress={() => setShow(true)}
+        activeOpacity={0.8}
+      >
+        {renderServer()}
+      </TouchableOpacity>
+
+      {renderServersModal()}
+    </SafeAreaView>
+  );
+};
+
+export default VPN;
 
 const styles = StyleSheet.create({
   container: {
